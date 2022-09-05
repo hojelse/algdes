@@ -41,6 +41,10 @@ public class GS {
 
     sc.close();
 
+    createMatching(N, gs);
+  }
+
+  private static void createMatching(int N, GS gs) {
     while (!gs.free.isEmpty()) {
       int man = gs.free.pop();
       
