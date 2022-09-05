@@ -39,8 +39,6 @@ public class GS {
 
     GS gs = parse(N, sc);
 
-    // printStuff(N, gs);
-
     sc.close();
 
     while (!gs.free.isEmpty()) {
@@ -68,43 +66,8 @@ public class GS {
           gs.free.push(man2);
         }
       }
-
-      // printPairings(N, gs);
     }
-
     printPairings(N, gs);
-  }
-
-  private static void printPairings(int N, GS gs) {
-    for (int woman = 0; woman < N; woman++) {
-      Integer man = gs.current[woman];
-
-      System.out.println(((man==null) ? "null" : gs.man[man]) + " -- " + gs.woman[woman]);
-    }
-    System.out.println();
-  }
-
-  private static void printStuff(int N, GS gs) {
-    for (int i = 0; i < N; i++)
-      System.out.println(i + ": " + gs.man[i]);
-    for (int i = 0; i < N; i++)
-      System.out.println(i + ": " + gs.woman[i]);
-    for (int i = 0; i < N; i++) {
-      int[] pref = gs.manPref[i];
-      System.out.print(gs.man[i] + ": ");
-      for (int j = 0; j < N; j++) {
-        System.out.print(gs.woman[pref[j]] + ", ");
-      }
-      System.out.println();
-    }
-    for (int i = 0; i < N; i++) {
-      int[] pref = gs.womanPref[i];
-      System.out.print(gs.woman[i] + ": ");
-      for (int j = 0; j < N; j++) {
-        System.out.print(gs.man[pref[j]] + ", ");
-      }
-      System.out.println();
-    }
   }
 
   private static GS parse(int N, Scanner sc) {
@@ -153,5 +116,36 @@ public class GS {
     return gs;
   }
 
+  private static void printPairings(int N, GS gs) {
+    for (int woman = 0; woman < N; woman++) {
+      Integer man = gs.current[woman];
+
+      System.out.println(((man==null) ? "null" : gs.man[man]) + " -- " + gs.woman[woman]);
+    }
+    System.out.println();
+  }
+
+  private static void printStuff(int N, GS gs) {
+    for (int i = 0; i < N; i++)
+      System.out.println(i + ": " + gs.man[i]);
+    for (int i = 0; i < N; i++)
+      System.out.println(i + ": " + gs.woman[i]);
+    for (int i = 0; i < N; i++) {
+      int[] pref = gs.manPref[i];
+      System.out.print(gs.man[i] + ": ");
+      for (int j = 0; j < N; j++) {
+        System.out.print(gs.woman[pref[j]] + ", ");
+      }
+      System.out.println();
+    }
+    for (int i = 0; i < N; i++) {
+      int[] pref = gs.womanPref[i];
+      System.out.print(gs.woman[i] + ": ");
+      for (int j = 0; j < N; j++) {
+        System.out.print(gs.man[pref[j]] + ", ");
+      }
+      System.out.println();
+    }
+  }
 }
 
