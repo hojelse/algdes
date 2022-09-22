@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System;
+
 
 class Program
 {
@@ -8,17 +10,34 @@ class Program
 
   static void Main(string[] args)
   {
-    SkipTSPHeader();
-    var points = ParsePoints();
-
+    // RunKattis();
     var timer = new Stopwatch();
     Console.WriteLine($"Closest pair...");
     timer.Start();
 
-    (double minDist, Point p1, Point p2) = ClosestPair(points);
+    RunThore();
 
     timer.Stop();
     Console.WriteLine($"Closest pair in: {timer.ElapsedMilliseconds}ms");
+  }
+
+  private static void RunKattis()
+  {
+    int N = -1;
+    while ((N = int.Parse(Console.ReadLine())) != 0)
+    {
+      var points = ParsePointsKattis(N);
+      (double minDist, Point p1, Point p2) = ClosestPair(points);
+      Console.WriteLine($"{p1.x} {p1.y} {p2.x} {p2.y}");
+    }
+  }
+
+  private static void RunThore()
+  {
+    SkipTSPHeader();
+    var points = ParsePoints();
+
+    (double minDist, Point p1, Point p2) = ClosestPair(points);
 
     Console.WriteLine($"minimum distance: {minDist}");
     Console.WriteLine($"point {p1.id} at ({p1.x}, {p1.y})");
@@ -79,7 +98,7 @@ class Program
 
   private static (double sdist, Point s1, Point s2) MinOfCutSet(double delta, double mid, List<Point> Py)
   {
-    List<Point> Sy = new();
+    List<Point> Sy = new List<Point>();
 
     foreach (var point in Py)
       if (Math.Abs(mid - point.x) < delta)
@@ -125,8 +144,8 @@ class Program
   private static (double, Point, Point) ClosestPairQuadraticWithCap(IList<Point> points, int cap)
   {
     double minDist = double.PositiveInfinity;
-    Point? minP1 = null;
-    Point? minP2 = null;
+    Point minP1 = null;
+    Point minP2 = null;
     int N = points.Count;
 
     for (int i = 0; i < N; i++)
@@ -155,8 +174,8 @@ class Program
   private static (double, Point, Point) ClosestPairQuadratic(Span<Point> points)
   {
     double minDist = double.PositiveInfinity;
-    Point? minP1 = null;
-    Point? minP2 = null;
+    Point minP1 = null;
+    Point minP2 = null;
     int N = points.Length;
 
     for (int i = 0; i < N; i++)
@@ -188,6 +207,24 @@ class Program
     double dx = p1.x - p2.x;
     double dy = p1.y - p2.y;
     return Math.Sqrt(dx*dx + dy*dy);
+  }
+
+  private static List<Point> ParsePointsKattis(int N)
+  {
+    List<Point> list = new List<Point>();
+
+    for (int i = 0; i < N; i++)
+    {
+      line = Console.ReadLine();
+      line = line.Trim();
+      string[] tokens = Regex.Split(line, @"\s+");
+      double x = parseDouble(tokens[0]);
+      double y = parseDouble(tokens[1]);
+
+      list.Add(new Point($"{x}-{y}", x, y));
+    }
+
+    return list;
   }
 
   private static List<Point> ParsePoints()
