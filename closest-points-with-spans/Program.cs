@@ -61,8 +61,8 @@ class Program
     if (Px.Length <= 3)
       return ClosestPairQuadratic(Px);
 
-    var leftX = Px.Slice(0, Px.Length/2);
-    var rightX = Px.Slice(Px.Length/2-1, Px.Length/2);
+    var leftX = Px.LeftHalf();
+    var rightX = Px.RightHalf();
 
     var mid = leftX[leftX.Length-1].x;
 
@@ -275,4 +275,18 @@ class Point
     this.id = id; this.x = x; this.y = y;
   }
 
+}
+
+public static class ExtensionMethods
+{
+  public static Span<T> LeftHalf<T>(this Span<T> s)
+  {
+    var left = s.Slice(0, s.Length/2);
+    return left;
+  }
+  public static Span<T> RightHalf<T>(this Span<T> s)
+  {
+    var right = s.Slice(s.Length/2-1, s.Length/2);
+    return right;
+  }
 }
