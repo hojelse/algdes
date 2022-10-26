@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
-using System;
-
+﻿using System.Text.RegularExpressions;
 
 class Program
 {
@@ -11,14 +7,7 @@ class Program
   static void Main(string[] args)
   {
     // RunKattis();
-    var timer = new Stopwatch();
-    Console.WriteLine($"Closest pair...");
-    timer.Start();
-
     RunThore();
-
-    timer.Stop();
-    Console.WriteLine($"Closest pair in: {timer.ElapsedMilliseconds}ms");
   }
 
   private static void RunKattis()
@@ -252,11 +241,6 @@ class Program
     char firstChar = (char)Console.In.Peek();
 
     if (firstChar == 'N') while (Console.ReadLine().Trim() != "NODE_COORD_SECTION") { }
-  }
-
-  private static void NewMethod()
-  {
-    Console.WriteLine("tsp");
   }
 
   static double parseDouble(string str) {
