@@ -48,25 +48,25 @@ public class FlowGraphDirectedAdj
         Augment(path, FindBottleneck(path));
   }
 
-  private void Augment(Edge[] path, int b)
+  private void Augment(Edge[] pathTree, int b)
   {
-    foreach (Edge curr in GetPath(path))
+    foreach (Edge curr in GetPath(pathTree))
       curr.IncreaseFlow(b);
   }
 
-  private int FindBottleneck(Edge[] path)
+  private int FindBottleneck(Edge[] pathTree)
   {
     var bottleNeck = int.MaxValue;
 
-    foreach (Edge curr in GetPath(path))
+    foreach (Edge curr in GetPath(pathTree))
       bottleNeck = Math.Min(bottleNeck, curr.w);
 
     return bottleNeck;
   }
 
-  private bool TryFindPath(int minEdgeWeight, out Edge[] path)
+  private bool TryFindPath(int minEdgeWeight, out Edge[] pathTree)
   {
-    path = new Edge[N];
+    pathTree = new Edge[N];
     var visited = new HashSet<int>();
     var stack = new Stack<int>();
 
@@ -80,7 +80,7 @@ public class FlowGraphDirectedAdj
         if (outEdge.w < minEdgeWeight) continue;
         if (visited.Contains(outEdge.to)) continue;
 
-        path[outEdge.to] = outEdge;
+        pathTree[outEdge.to] = outEdge;
         visited.Add(outEdge.to);
         stack.Push(outEdge.to);
 
@@ -93,9 +93,9 @@ public class FlowGraphDirectedAdj
   }
 
   // Traverse a tree of edges from sink (leaf) to source (root)
-  private IEnumerable<Edge> GetPath(Edge[] tree)
+  private IEnumerable<Edge> GetPath(Edge[] pathTree)
   {
-    for (Edge curr = tree[this.sink]; curr != null; curr = tree[curr.from])
+    for (Edge curr = pathTree[this.sink]; curr != null; curr = pathTree[curr.from])
       yield return curr;
   }
 }
