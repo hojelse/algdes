@@ -2,226 +2,175 @@
 using System.Collections.Generic;
 using System.Linq;
 
-class paintball
+class Program
 {
-  static void Main(string[] args)
+  public static void Main()
   {
-    var tokens = Console.ReadLine().Split();
-    int N = int.Parse(tokens[0]);
-    int M = int.Parse(tokens[1]);
+    var firstline = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();
+    var n = firstline[0];
+    var m = firstline[1];
+    var s = 0;
+    var t = n+1;
 
-    var graph = ParseGraph(N, M);
+    var g = new FlowGraphDirectedAdj(s, t, n*2+2);
 
-    int maxFlow = graph.FordFulkerson();
-
-    foreach (var edge in graph.GetSolutionEdges())
+    for (int i = 0; i < m; i++)
     {
-      Console.WriteLine($"{edge.from} --> {edge.to} w:{edge.flow}");
+      var line = Console.ReadLine().Split(" ").Select(int.Parse).ToArray();
+      var from = line[0]; // make zero indexed
+      var to = line[1]; // make zero indexed
+      var w = 1;
+
+      g.AddEdge(from, t+to, w);
+      g.AddEdge(to, t+from, w);
     }
 
-    Console.WriteLine("maxflow" + maxFlow);
-
-    if(maxFlow == N)
+    for (int i = 1; i <= n; i++)
     {
-      for (int i = 1; i <= N; i++)
-        Console.WriteLine(graph.orig[i].Find(x => x.to != 0 && x.flow != 0)?.to - N);
+      g.AddEdge(s, i, 1);
+      g.AddEdge(t+i, t, 1);
     }
-    else
+
+    int maxflow = g.MaxFlow();
+
+    if (maxflow != n)
+    {
       Console.WriteLine("Impossible");
-  }
-
-  private static MaxFlow ParseGraph(int N, int M)
-  {
-    int source = 0;
-    int sink = N*2+1;
-
-    var graph = new MaxFlow(source, sink, N*2+2);
-
-    for (int i = 0; i < M; i++)
-    {
-      var tokens = Console.ReadLine().Split();
-      var a = int.Parse(tokens[0]);
-      var b = int.Parse(tokens[1]);
-
-      graph.AddEdge(a, b+N, 1);
-      graph.AddEdge(b, a+N, 1);
+      return;
     }
 
-    for (int i = 1; i <= N; i++)
-      graph.AddEdge(source, i, 1);
+    for (int i = 1; i <= n; i++)
+      foreach (var edge in g.res[i])
+        if (edge.to != 0 && edge.reverse.w > 0)
+          Console.WriteLine(edge.to-t);
 
-    for (int i = 1; i <= N; i++)
-      graph.AddEdge(i+N, sink, 1);
-
-    return graph;
   }
 }
 
-class MaxFlow
+public class FlowGraphDirectedAdj
 {
-  public List<List<Edge>> orig;
-  List<List<Edge>> res;
-  int s;
-  int t;
-  public int n;
+  public Dictionary<int, List<Edge>> res;
+  public int N;
+  public int source;
+  public int sink;
+  int scaler = 0;
 
-  public MaxFlow(int s, int t, int n)
+  public FlowGraphDirectedAdj(int source, int sink, int N)
   {
-    this.s = s;
-    this.t = t;
-    this.n = n;
-    res = new List<List<Edge>>();
-    for (int i = 0; i < n; i++) res.Add(new List<Edge>());
-    orig = new List<List<Edge>>();
-    for (int i = 0; i < n; i++) orig.Add(new List<Edge>());
+    this.source = source;
+    this.sink = sink;
+    this.N = N;
+    this.res = new Dictionary<int, List<Edge>>();
   }
 
-  public void AddEdge(int u, int v, int w)
+  public void AddEdge(int from, int to, int w)
   {
-    (Edge forward, Edge backward) = Edge.BuildEdges(u, v, w);
+    this.scaler = Math.Max(this.scaler, w);
 
-    res[u].Add(forward);
-    orig[u].Add(forward);
-    res[v].Add(backward);
+    res.TryAdd(from, new List<Edge>());
+    res.TryAdd(to, new List<Edge>());
+
+    (Edge forward, Edge backward) = Edge.BuildEdges(from, to, w);
+    res[from].Add(forward);
+    res[to].Add(backward);
   }
 
-  public int FordFulkerson()
+  public int MaxFlow()
   {
-    while(TryFindPath(out LinkedList<Edge> path))
+    FordFulkerson();
+
+    int sum = 0;
+    foreach (var edge in res[source])
+      if(edge.isForward)
+        sum += edge.reverse.w;
+    return sum;
+  }
+
+  public void FordFulkerson()
+  {
+    while (scaler > 0)
     {
-      int b = bottleneck(path);
-
-      foreach (var edge in path)
-        edge.IncFlow(b);
-    }
-
-    return orig[s].Sum(x => x.flow);
-  }
-
-  public List<Edge> GetSolutionEdges()
-  {
-    List<Edge> solutionEdges = new List<Edge>();
-
-    foreach (var neighbors in orig)
-      foreach (var edge in neighbors)
-        if (edge.flow > 0)
-          solutionEdges.Add(edge);
-
-    return solutionEdges;
-  }
-
-  public List<Edge> GetCutSet()
-  {
-    var visited = GetSourceComponent();
-
-    List<Edge> cutset = new List<Edge>();
-
-    foreach (int v in visited)
-      foreach (Edge e in orig[v])
-        if(!visited.Contains(e.to))
-          cutset.Add(e);
-
-    return cutset;
-  }
-
-  public HashSet<int> GetSourceComponent()
-  {
-    HashSet<int> visited = new HashSet<int>();
-    Stack<Edge> stack = new Stack<Edge>();
-
-    var e = new Edge(-1, s, -1, true);
-    var v = s;
-    stack.Push(e);
-
-    while (stack.Count > 0)
-    {
-      e = stack.Pop();
-      v = e.to;
-
-      if (visited.Contains(v)) continue;
-
-      var neighbors = res[v];
-      foreach (var edge in neighbors)
+      while (TryFindPath(scaler, out Edge[] path))
       {
-        if (edge.w == 0) continue;
-        if (visited.Contains(edge.to)) continue;
-        stack.Push(edge);
+        int b = FindBottleneck(path);
+        Augment(path, b);
       }
 
-      visited.Add(v);
+      scaler /= 2;
+    }
+  }
+
+  private void Augment(Edge[] path, int b)
+  {
+    for (Edge curr = path[this.sink]; curr != null; curr = path[curr.from])
+    {
+      curr.IncreaseFlow(b);
+    }
+  }
+
+  private int FindBottleneck(Edge[] path)
+  {
+    var bottleNeck = int.MaxValue;
+
+    for (Edge curr = path[this.sink]; curr != null; curr = path[curr.from])
+    {
+      bottleNeck = Math.Min(bottleNeck, curr.w);
     }
 
-    return visited;
+    return bottleNeck;
   }
 
-  private int bottleneck(LinkedList<Edge> path)
+  private bool TryFindPath(int scaler, out Edge[] path)
   {
-    var minW = path.First().w;
+    var visited = new HashSet<int>();
+    path = new Edge[N];
 
-    foreach (var edge in path)
-      if(edge.w < minW)
-        minW = edge.w;
+    var stack = new Stack<int>();
+    stack.Push(this.source);
+    visited.Add(this.source);
 
-    return minW;
-  }
-
-  private bool TryFindPath(out LinkedList<Edge> path)
-  {
-    HashSet<int> visited = new HashSet<int>();
-    Stack<Edge> stack = new Stack<Edge>();
-    path = new LinkedList<Edge>();
-
-    var e = new Edge(-1, s, -1, true);
-    var v = s;
-    stack.Push(e);
-
-    while (stack.Count > 0)
+    while (stack.TryPop(out int curr))
     {
-      e = stack.Pop();
-      v = e.to;
-
-      if (this.s != v) path.AddLast(e);
-
-      if (v == this.t) return true;
-
-      if (visited.Contains(v)) continue;
-
-      var neighbors = res[v];
-      foreach (var edge in neighbors)
+      foreach (Edge outEdge in res[curr])
       {
-        if (edge.w == 0) continue;
-        if (visited.Contains(edge.to)) continue;
-        stack.Push(edge);
-      }
+        int neighbor = outEdge.to;
 
-      visited.Add(v);
+        if (outEdge.w >= this.scaler && !visited.Contains(neighbor))
+        {
+          stack.Push(neighbor);
+          visited.Add(neighbor);
+          path[neighbor] = outEdge;
+
+          if (neighbor == sink)
+            return true;
+        }
+      }
     }
 
     return false;
   }
 }
 
-class Edge
+public class Edge
 {
-  public int from { get; private set; }
-  public int to { get; private set; }
-  public int w { get; private set; }
-  public Edge reverse { get; private set; }
-  public bool forward { get; private set; }
-  public int flow = 0;
+  public int from;
+  public int to;
+  public int w;
+  public bool isForward;
+  public Edge reverse;
 
-  public Edge(int u, int v, int w, bool forward)
+  public Edge(int from, int to, int w, bool isForward)
   {
-    this.from = u;
-    this.to = v;
+    this.from = from;
+    this.to = to;
     this.w = w;
-    this.forward = forward;
+    this.isForward = isForward;
   }
 
-  public static (Edge, Edge) BuildEdges(int u, int v, int w)
+  public static (Edge, Edge) BuildEdges(int from, int to, int w)
   {
-    var forward = new Edge(u, v, w, true);
-    var backward = new Edge(v, u, 0, false);
+    var forward = new Edge(from, to, w, true);
+    var backward = new Edge(to, from, 0, false);
 
     forward.reverse = backward;
     backward.reverse = forward;
@@ -229,18 +178,9 @@ class Edge
     return (forward, backward);
   }
 
-  internal void IncFlow(int b)
+  public void IncreaseFlow(int b)
   {
-    if(forward)
-    {
-      this.w -= b;
-      this.reverse.w += b;
-      this.flow += b;
-    } else {
-      this.w += b;
-      this.reverse.w -= b;
-      this.reverse.flow -= b;
-    }
+    this.w -= b;
+    this.reverse.w += b;
   }
 }
-
