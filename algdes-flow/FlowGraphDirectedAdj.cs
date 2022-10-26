@@ -3,126 +3,123 @@ using System.Collections.Generic;
 
 public class FlowGraphDirectedAdj
 {
-  Dictionary<int, List<Edge>> graph;
-  Dictionary<int, List<Edge>> res;
-  int N;
-  int source;
-  int sink;
-  int scaler = 0;
+  public Dictionary<int, List<Edge>> adj;
+  public int N;
+  public int source;
+  public int sink;
+  int maxEdgeCapacity = 0;
 
   public FlowGraphDirectedAdj(int source, int sink, int N)
   {
     this.source = source;
     this.sink = sink;
     this.N = N;
-    this.graph = new Dictionary<int, List<Edge>>();
-    this.res = new Dictionary<int, List<Edge>>();
+    this.adj = new Dictionary<int, List<Edge>>();
   }
 
   public void AddEdge(int from, int to, int w)
   {
-    this.scaler = Math.Max(this.scaler, w);
+    this.maxEdgeCapacity = Math.Max(this.maxEdgeCapacity, w);
 
-    graph.TryAdd(from, new List<Edge>());
-    res.TryAdd(from, new List<Edge>());
-    res.TryAdd(to, new List<Edge>());
-
-    var origEdge = new Edge(from, to, w);
-    graph[from].Add(origEdge);
+    adj.TryAdd(from, new List<Edge>());
+    adj.TryAdd(to, new List<Edge>());
 
     (Edge forward, Edge backward) = Edge.BuildEdges(from, to, w);
-    res[from].Add(forward);
-    res[to].Add(backward);
+    adj[from].Add(forward);
+    adj[to].Add(backward);
   }
 
   public int MaxFlow()
   {
     FordFulkerson();
+
+    int sum = 0;
+    foreach (var edge in adj[source])
+      if(edge.isForward)
+        sum += edge.reverse.w;
+
+    return sum;
   }
 
   public void FordFulkerson()
   {
-    while (scaler > 0)
-    {
-      while (TryFindPath(scaler, out Edge[] path))
-      {
-        int b = FindBottleneck(path);
-        Augment(path, b);
-      }
-
-      scaler /= 2;
-    }
+    for (int minEdgeWeight = this.maxEdgeCapacity; minEdgeWeight > 0; minEdgeWeight /= 2)
+      while (TryFindPath(minEdgeWeight, out Edge[] path))
+        Augment(path, FindBottleneck(path));
   }
 
   private void Augment(Edge[] path, int b)
   {
-    for (Edge curr = path[this.sink]; curr != null; curr = path[curr.from])
-    {
+    foreach (Edge curr in GetPath(path))
       curr.IncreaseFlow(b);
-    }
   }
 
   private int FindBottleneck(Edge[] path)
   {
     var bottleNeck = int.MaxValue;
 
-    for (Edge curr = path[this.sink]; curr != null; curr = path[curr.from])
-    {
+    foreach (Edge curr in GetPath(path))
       bottleNeck = Math.Min(bottleNeck, curr.w);
-    }
 
     return bottleNeck;
   }
 
-  private bool TryFindPath(int scaler, out Edge[] path)
+  private bool TryFindPath(int minEdgeWeight, out Edge[] path)
   {
-    var visited = new HashSet<int>();
     path = new Edge[N];
-
+    var visited = new HashSet<int>();
     var stack = new Stack<int>();
+
     stack.Push(this.source);
     visited.Add(this.source);
 
     while (stack.TryPop(out int curr))
     {
-      foreach (Edge outEdge in res[curr])
+      foreach (Edge outEdge in adj[curr])
       {
-        int neighbor = outEdge.to;
+        if (outEdge.w < minEdgeWeight) continue;
+        if (visited.Contains(outEdge.to)) continue;
 
-        if (outEdge.w >= this.scaler && !visited.Contains(neighbor))
-        {
-          stack.Push(neighbor);
-          visited.Add(neighbor);
-          path[neighbor] = outEdge;
+        path[outEdge.to] = outEdge;
+        visited.Add(outEdge.to);
+        stack.Push(outEdge.to);
 
-          if (neighbor == sink)
-            return true;
-        }
+        if (outEdge.to == sink)
+          return true;
       }
     }
 
     return false;
   }
+
+  // Traverse a tree of edges from sink (leaf) to source (root)
+  private IEnumerable<Edge> GetPath(Edge[] tree)
+  {
+    for (Edge curr = tree[this.sink]; curr != null; curr = tree[curr.from])
+      yield return curr;
+  }
 }
 
-class Edge
+public class Edge
 {
   public int from;
   public int to;
   public int w;
+  public bool isForward;
   public Edge reverse;
 
-  public Edge(int from, int to, int w)
+  public Edge(int from, int to, int w, bool isForward)
   {
     this.from = from;
     this.to = to;
     this.w = w;
+    this.isForward = isForward;
   }
 
   public static (Edge, Edge) BuildEdges(int from, int to, int w)
   {
-    var forward = new Edge(from, to, w);
-    var backward = new Edge(to, from, 0);
+    var forward = new Edge(from, to, w, true);
+    var backward = new Edge(to, from, 0, false);
 
     forward.reverse = backward;
     backward.reverse = forward;
