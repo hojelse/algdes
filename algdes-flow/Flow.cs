@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class FlowGraphDirectedAdj
+public class Flow
 {
   public Dictionary<int, List<Edge>> adj;
   public int N;
@@ -9,7 +9,7 @@ public class FlowGraphDirectedAdj
   public int sink;
   int maxEdgeCapacity = 0;
 
-  public FlowGraphDirectedAdj(int source, int sink, int N)
+  public Flow(int source, int sink, int N)
   {
     this.source = source;
     this.sink = sink;

@@ -19,7 +19,7 @@ class Program
     var s = 0;
     var t = n+1;
 
-    var g = new FlowGraphDirectedAdj(s, t, n*2+2);
+    var g = new Flow(s, t, n*2+2);
 
     for (int i = 0; i < m; i++)
     {
@@ -94,7 +94,7 @@ class Program
 
   private static void RunThore()
   {
-    FlowGraphDirectedAdj g = ParseThoreInput();
+    Flow g = ParseThoreInput();
 
     g.FordFulkerson();
     int maxFlow = g.MaxFlow();
@@ -102,7 +102,7 @@ class Program
     Console.WriteLine(maxFlow);
   }
 
-  private static FlowGraphDirectedAdj ParseThoreInput()
+  private static Flow ParseThoreInput()
   {
     var N = int.Parse(Console.ReadLine()!);
 
@@ -111,7 +111,7 @@ class Program
 
     int source = 0;
     int sink = N-1;
-    var g = new FlowGraphDirectedAdj(source, sink, N);
+    var g = new Flow(source, sink, N);
 
     var M = int.Parse(Console.ReadLine()!);
     for (var i = 0; i < M; i++)
