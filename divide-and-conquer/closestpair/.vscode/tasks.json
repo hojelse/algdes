@@ -7,7 +7,7 @@
       "type": "process",
       "args": [
         "build",
-        "${workspaceFolder}/longincsubseq.csproj",
+        "${workspaceFolder}/closestpair.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
@@ -19,7 +19,7 @@
       "type": "process",
       "args": [
         "publish",
-        "${workspaceFolder}/longincsubseq.csproj",
+        "${workspaceFolder}/closestpair.csproj",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],
@@ -33,7 +33,7 @@
         "watch",
         "run",
         "--project",
-        "${workspaceFolder}/longincsubseq.csproj"
+        "${workspaceFolder}/closestpair.csproj"
       ],
       "problemMatcher": "$msCompile"
     }

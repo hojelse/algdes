@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 class Program
 {
@@ -130,10 +132,8 @@ class ClosestPairs
     
     foreach (var p in Py)
     {
-      if (p.x <= mid)
-        leftY.Add(p);
-      else
-        rightY.Add(p);
+      if (p.x <= mid) leftY.Add(p);
+      else            rightY.Add(p);
     }
 
     return (leftY, rightY);
@@ -150,7 +150,7 @@ class ClosestPairs
     if (Sy.Count < 2)
       return (double.MaxValue, null, null);
 
-    return ClosestPairQuadratic(Sy, 15);
+    return ClosestPairQuadraticWithCap(Sy, 15);
   }
 
   private static List<Point> SortPointsY(List<Point> points)
@@ -176,7 +176,7 @@ class ClosestPairs
     return pointsSortedX;
   }
 
-  private static (double, Point, Point) ClosestPairQuadratic(IList<Point> points, int cap = int.MaxValue)
+  private static (double, Point, Point) ClosestPairQuadraticWithCap(IList<Point> points, int cap = int.MaxValue)
   {
     double minDist = double.PositiveInfinity;
     Point minP1 = null;
@@ -186,6 +186,36 @@ class ClosestPairs
     for (int i = 0; i < N; i++)
     {
       for (int j = i; j < Math.Min(cap, N); j++)
+      {
+        if (i == j) continue;
+        Point p1 = points[i];
+        Point p2 = points[j];
+
+        double d = dist(p1, p2);
+        if (d < minDist) {
+          minDist = d;
+          minP1 = p1;
+          minP2 = p2;
+        }
+      }
+    }
+
+    if (minP1 == null || minP2 == null)
+      throw new Exception("No pairs found");
+
+    return (minDist, minP1, minP2);
+  }
+
+  private static (double, Point, Point) ClosestPairQuadratic(Span<Point> points)
+  {
+    double minDist = double.PositiveInfinity;
+    Point minP1 = null;
+    Point minP2 = null;
+    int N = points.Length;
+
+    for (int i = 0; i < N; i++)
+    {
+      for (int j = i; j < N; j++)
       {
         if (i == j) continue;
         Point p1 = points[i];
