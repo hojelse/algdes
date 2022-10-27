@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-class ClosestPairs
+public class KleinbergTardosClosestPair
 {
   public static (double minDist, Point p1, Point p2) ClosestPair(List<Point> points)
   {
@@ -160,7 +160,7 @@ class ClosestPairs
   }
 }
 
-class Point
+public class Point
 {
   public string id { get; }
   public double x { get; }

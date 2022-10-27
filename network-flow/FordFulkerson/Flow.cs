@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class Flow
 {
-  public Dictionary<int, List<Edge>> adj;
+  public Dictionary<int, List<FlowEdge>> adj;
   public int N;
   public int source;
   public int sink;
@@ -14,17 +14,17 @@ public class Flow
     this.source = source;
     this.sink = sink;
     this.N = N;
-    this.adj = new Dictionary<int, List<Edge>>();
+    this.adj = new Dictionary<int, List<FlowEdge>>();
   }
 
   public void AddEdge(int from, int to, int w)
   {
     this.maxEdgeCapacity = Math.Max(this.maxEdgeCapacity, w);
 
-    adj.TryAdd(from, new List<Edge>());
-    adj.TryAdd(to, new List<Edge>());
+    adj.TryAdd(from, new List<FlowEdge>());
+    adj.TryAdd(to, new List<FlowEdge>());
 
-    (Edge forward, Edge backward) = Edge.BuildEdges(from, to, w);
+    (FlowEdge forward, FlowEdge backward) = FlowEdge.BuildEdges(from, to, w);
     adj[from].Add(forward);
     adj[to].Add(backward);
   }
@@ -44,29 +44,29 @@ public class Flow
   public void FordFulkerson()
   {
     for (int minEdgeWeight = this.maxEdgeCapacity; minEdgeWeight > 0; minEdgeWeight /= 2)
-      while (TryFindPath(minEdgeWeight, out Edge[] path))
+      while (TryFindPath(minEdgeWeight, out FlowEdge[] path))
         Augment(path, FindBottleneck(path));
   }
 
-  private void Augment(Edge[] pathTree, int b)
+  private void Augment(FlowEdge[] pathTree, int b)
   {
-    foreach (Edge curr in GetPath(pathTree))
+    foreach (FlowEdge curr in GetPath(pathTree))
       curr.IncreaseFlow(b);
   }
 
-  private int FindBottleneck(Edge[] pathTree)
+  private int FindBottleneck(FlowEdge[] pathTree)
   {
     var bottleNeck = int.MaxValue;
 
-    foreach (Edge curr in GetPath(pathTree))
+    foreach (FlowEdge curr in GetPath(pathTree))
       bottleNeck = Math.Min(bottleNeck, curr.w);
 
     return bottleNeck;
   }
 
-  private bool TryFindPath(int minEdgeWeight, out Edge[] pathTree)
+  private bool TryFindPath(int minEdgeWeight, out FlowEdge[] pathTree)
   {
-    pathTree = new Edge[N];
+    pathTree = new FlowEdge[N];
     var visited = new HashSet<int>();
     var stack = new Stack<int>();
 
@@ -75,7 +75,7 @@ public class Flow
 
     while (stack.TryPop(out int curr))
     {
-      foreach (Edge outEdge in adj[curr])
+      foreach (FlowEdge outEdge in adj[curr])
       {
         if (outEdge.w < minEdgeWeight) continue;
         if (visited.Contains(outEdge.to)) continue;
@@ -93,22 +93,69 @@ public class Flow
   }
 
   // Traverse a tree of edges from sink (leaf) to source (root)
-  private IEnumerable<Edge> GetPath(Edge[] pathTree)
+  private IEnumerable<FlowEdge> GetPath(FlowEdge[] pathTree)
   {
-    for (Edge curr = pathTree[this.sink]; curr != null; curr = pathTree[curr.from])
+    for (FlowEdge curr = pathTree[this.sink]; curr != null; curr = pathTree[curr.from])
       yield return curr;
+  }
+
+  public HashSet<OriginalEdge> GetSolutionEdges()
+  {
+    var set = new HashSet<OriginalEdge>();
+    foreach (var kv in adj)
+      foreach (var edge in kv.Value)
+        if (edge.isForward && edge.reverse.w > 0)
+          set.Add(new OriginalEdge(edge.from, edge.to, edge.reverse.w));
+    return set;
+  }
+
+  public HashSet<int> GetSourceComponent()
+  {
+    var visited = new HashSet<int>();
+    var stack = new Stack<int>();
+
+    stack.Push(this.source);
+    visited.Add(this.source);
+
+    while (stack.TryPop(out int curr))
+    {
+      foreach (var outEdge in adj[curr])
+      {
+        if (outEdge.w < 1) continue;
+        if (visited.Contains(outEdge.to)) continue;
+
+        visited.Add(outEdge.to);
+        stack.Push(outEdge.to);
+      }
+    }
+
+    return visited;
   }
 }
 
-public class Edge
+public class OriginalEdge
+{
+  public int from;
+  public int to;
+  public int flow;
+
+  public OriginalEdge(int from, int to, int flow)
+  {
+    this.from = from;
+    this.to = to;
+    this.flow = flow;
+  }
+}
+
+public class FlowEdge
 {
   public int from;
   public int to;
   public int w;
   public bool isForward;
-  public Edge reverse;
+  public FlowEdge reverse;
 
-  public Edge(int from, int to, int w, bool isForward)
+  public FlowEdge(int from, int to, int w, bool isForward)
   {
     this.from = from;
     this.to = to;
@@ -116,10 +163,10 @@ public class Edge
     this.isForward = isForward;
   }
 
-  public static (Edge, Edge) BuildEdges(int from, int to, int w)
+  public static (FlowEdge, FlowEdge) BuildEdges(int from, int to, int w)
   {
-    var forward = new Edge(from, to, w, true);
-    var backward = new Edge(to, from, 0, false);
+    var forward = new FlowEdge(from, to, w, true);
+    var backward = new FlowEdge(to, from, 0, false);
 
     forward.reverse = backward;
     backward.reverse = forward;
