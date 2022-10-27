@@ -6,8 +6,8 @@ class Program
 
   static void Main(string[] args)
   {
-    // RunKattis();
-    RunThore();
+    RunKattis();
+    // RunThore();
   }
 
   private static void RunKattis()
@@ -16,7 +16,7 @@ class Program
     while ((N = int.Parse(Console.ReadLine())) != 0)
     {
       var points = ParsePointsKattis(N);
-      (double minDist, Point p1, Point p2) = ClosestPair(points);
+      (double minDist, Point p1, Point p2) = ClosestPairs.ClosestPair(points);
       Console.WriteLine($"{p1.x} {p1.y} {p2.x} {p2.y}");
     }
   }
@@ -26,14 +26,68 @@ class Program
     SkipTSPHeader();
     var points = ParsePoints();
 
-    (double minDist, Point p1, Point p2) = ClosestPair(points);
+    (double minDist, Point p1, Point p2) = ClosestPairs.ClosestPair(points);
 
     Console.WriteLine($"minimum distance: {minDist}");
     Console.WriteLine($"point {p1.id} at ({p1.x}, {p1.y})");
     Console.WriteLine($"point {p2.id} at ({p2.x}, {p2.y})");
   }
 
-  private static (double minDist, Point p1, Point p2) ClosestPair(List<Point> points)
+  // Parsing
+
+  private static List<Point> ParsePointsKattis(int N)
+  {
+    List<Point> list = new List<Point>();
+
+    for (int i = 0; i < N; i++)
+    {
+      line = Console.ReadLine();
+      line = line.Trim();
+      string[] tokens = Regex.Split(line, @"\s+");
+      double x = parseDouble(tokens[0]);
+      double y = parseDouble(tokens[1]);
+
+      list.Add(new Point($"{x}-{y}", x, y));
+    }
+
+    return list;
+  }
+
+  private static List<Point> ParsePoints()
+  {
+    List<Point> list = new List<Point>();
+
+    while ((line = Console.ReadLine()) != null)
+    {
+      line = line.Trim();
+      if (line == "EOF") break;
+      if (line == "") break;
+      string[] tokens = Regex.Split(line, @"\s+");
+      string id = tokens[0];
+      double x = parseDouble(tokens[1]);
+      double y = parseDouble(tokens[2]);
+
+      list.Add(new Point(id, x, y));
+    }
+
+    return list;
+  }
+
+  private static void SkipTSPHeader()
+  {
+    char firstChar = (char)Console.In.Peek();
+
+    if (firstChar == 'N') while (Console.ReadLine().Trim() != "NODE_COORD_SECTION") { }
+  }
+
+  static double parseDouble(string str) {
+    return double.Parse(str, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
+  }
+}
+
+class ClosestPairs
+{
+  public static (double minDist, Point p1, Point p2) ClosestPair(List<Point> points)
   {
     Point[] pointsSortedX = SortPointsX(points).ToArray();
     Span<Point> Px = new Span<Point>(pointsSortedX);
@@ -96,14 +150,7 @@ class Program
     if (Sy.Count < 2)
       return (double.MaxValue, null, null);
 
-    return ClosestPairQuadraticWithCap(Sy, 15);
-  }
-
-  private static HashSet<string> GetIdsHashed(Span<Point> arr)
-  {
-    HashSet<string> set = new HashSet<string>();
-    foreach (var item in arr) set.Add(item.id);
-    return set;
+    return ClosestPairQuadratic(Sy, 15);
   }
 
   private static List<Point> SortPointsY(List<Point> points)
@@ -121,8 +168,7 @@ class Program
   private static List<Point> SortPointsX(List<Point> points)
   {
     var pointsSortedX = points;
-    pointsSortedX.Sort((p1, p2) =>
-    {
+    pointsSortedX.Sort((p1, p2) => {
       if (p1.x == p2.x) return 0;
       else if (p1.x > p2.x) return 1;
       else return -1;
@@ -130,7 +176,7 @@ class Program
     return pointsSortedX;
   }
 
-  private static (double, Point, Point) ClosestPairQuadraticWithCap(IList<Point> points, int cap)
+  private static (double, Point, Point) ClosestPairQuadratic(IList<Point> points, int cap = int.MaxValue)
   {
     double minDist = double.PositiveInfinity;
     Point minP1 = null;
@@ -160,91 +206,12 @@ class Program
     return (minDist, minP1, minP2);
   }
 
-  private static (double, Point, Point) ClosestPairQuadratic(Span<Point> points)
-  {
-    double minDist = double.PositiveInfinity;
-    Point minP1 = null;
-    Point minP2 = null;
-    int N = points.Length;
-
-    for (int i = 0; i < N; i++)
-    {
-      for (int j = i; j < N; j++)
-      {
-        if (i == j) continue;
-        Point p1 = points[i];
-        Point p2 = points[j];
-
-        double d = dist(p1, p2);
-        if (d < minDist) {
-          minDist = d;
-          minP1 = p1;
-          minP2 = p2;
-        }
-      }
-    }
-
-    if (minP1 == null || minP2 == null)
-      throw new Exception("No pairs found");
-
-    return (minDist, minP1, minP2);
-  }
-
   // Standard Euclidean distance
   private static double dist(Point p1, Point p2)
   {
     double dx = p1.x - p2.x;
     double dy = p1.y - p2.y;
     return Math.Sqrt(dx*dx + dy*dy);
-  }
-
-  private static List<Point> ParsePointsKattis(int N)
-  {
-    List<Point> list = new List<Point>();
-
-    for (int i = 0; i < N; i++)
-    {
-      line = Console.ReadLine();
-      line = line.Trim();
-      string[] tokens = Regex.Split(line, @"\s+");
-      double x = parseDouble(tokens[0]);
-      double y = parseDouble(tokens[1]);
-
-      list.Add(new Point($"{x}-{y}", x, y));
-    }
-
-    return list;
-  }
-
-  private static List<Point> ParsePoints()
-  {
-    List<Point> list = new List<Point>();
-
-    while ((line = Console.ReadLine()) != null)
-    {
-      line = line.Trim();
-      if (line == "EOF") break;
-      if (line == "") break;
-      string[] tokens = Regex.Split(line, @"\s+");
-      string id = tokens[0];
-      double x = parseDouble(tokens[1]);
-      double y = parseDouble(tokens[2]);
-
-      list.Add(new Point(id, x, y));
-    }
-
-    return list;
-  }
-
-  private static void SkipTSPHeader()
-  {
-    char firstChar = (char)Console.In.Peek();
-
-    if (firstChar == 'N') while (Console.ReadLine().Trim() != "NODE_COORD_SECTION") { }
-  }
-
-  static double parseDouble(string str) {
-    return double.Parse(str, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
   }
 }
 
