@@ -8,6 +8,7 @@
 
 ## Many
 - Longest path?
+- If HP then HP a solution
 
 ## Few
 - Add directed edge weights
