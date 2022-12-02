@@ -1,7 +1,7 @@
 #include <vector>
 typedef long long LL;
 // Assumes A is sorted
-LL binarySearch(std::vector<LL>& A, LL x) {
+LL BinarySearch(std::vector<LL>& A, LL x) {
   LL lo = 0;
   LL hi = A.size()-1;
   while (lo <= hi) {
