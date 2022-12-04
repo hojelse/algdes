@@ -12,7 +12,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - sim
 - itu.grades
 - itu.islandinfection
-- 0.2 Classics
+### 0.2 Classics
 - shortestpath1
 - minspantree
 - knapsack
