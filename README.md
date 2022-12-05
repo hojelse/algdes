@@ -21,7 +21,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - maxflow
 - polymul1
 - polymul2
-### 0.1. Stable matching
+### 1.0. Stable matching
 - drafttime
 - jealousyoungsters
 ### 2.0. Greedy
