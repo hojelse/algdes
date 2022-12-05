@@ -50,17 +50,21 @@ int main(void) {
 
   LL hr, hc, vr, vc;
 
-  for (LL r = 0; r < R; r++) {
+  for (LL r = 0; r < R; r++)
+  {
     std::vector<LL> v;
     std::string line;
     std::cin >> line;
-    for (LL c = 0; c < C; c++) {
+
+    for (LL c = 0; c < C; c++)
+    {
       LL i = line[c]-'0';
       // treat virus and human as land, but remember coordinates
       if      (i == 2) { vr = r; vc = c; v.push_back(1); }
       else if (i == 3) { hr = r; hc = c; v.push_back(1); }
       else             v.push_back(i);
     }
+
     matrix.push_back(v);
   }
 

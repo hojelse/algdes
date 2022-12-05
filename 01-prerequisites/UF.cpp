@@ -30,7 +30,7 @@ class UF
       LL i = find(p);
       LL j = find(q);
       if (i == j) return;
-
+      // set smaller tree under root of bigger tree
       if (size[i] < size[j]) { id[i] = j; size[j] += size[i]; }
       else                   { id[j] = i; size[i] += size[j]; }
       count--;
