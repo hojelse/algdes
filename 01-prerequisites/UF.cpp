@@ -3,6 +3,9 @@
 typedef long long LL;
 
 // Weighted quick-union with path compresson
+// contruction: O(N)
+// find: Not quite amortized O(1)
+// union: Not quite amortized O(1)
 class UF
 {
   private:
