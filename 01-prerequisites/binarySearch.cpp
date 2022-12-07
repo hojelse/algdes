@@ -1,11 +1,21 @@
+#include <iostream>
 #include <vector>
-typedef long long LL;
+#include <climits>
+using namespace std;
+#define inf LLONG_MAX
+typedef long long ll;
+typedef vector<ll> vi;
+typedef vector<vi> mi;
+typedef pair<ll, ll> ii;
+typedef vector<ii> vii;
+typedef vector<vii> mii;
+
 // Assumes A is sorted
-LL BinarySearch(std::vector<LL>& A, LL x) {
-  LL lo = 0;
-  LL hi = A.size()-1;
+ll BinarySearch(vector<ll>& A, ll x) {
+  ll lo = 0;
+  ll hi = A.size()-1;
   while (lo <= hi) {
-    LL mid = (lo+hi)/2;
+    ll mid = (lo+hi)/2;
     if (A[mid] == x) return mid;
     if (A[mid] > x) hi = mid-1;
     else lo = mid+1;
