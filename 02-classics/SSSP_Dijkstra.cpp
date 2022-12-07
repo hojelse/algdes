@@ -37,7 +37,7 @@ vi sssp_dijkstra(mii& adj, ll& s) {
   return distTo;
 }
 
-// Test on https://open.kattis.com/problems/shortestpath1
+// Test for https://open.kattis.com/problems/shortestpath1
 int main(void) {
   ll n, m, q, s;
   while (true)
