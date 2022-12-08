@@ -1,100 +1,64 @@
 #include <iostream>
 #include <vector>
-#include <climits>
+#include <set>
+#include <stdlib.h>
 using namespace std;
-#define inf LLONG_MAX
-typedef long long ll;
-typedef vector<ll> vi;
-typedef vector<vi> mi;
-typedef pair<ll, ll> ii;
-typedef vector<ii> vii;
-typedef vector<vii> mii;
+typedef vector<int> vi;
 
 // Weighted quick-union with path compression
-// contruction: O(N)
-// find: Not quite amortized O(1)
-// union: Not quite amortized O(1)
-class union_find
+struct union_find
 {
-  private:
-    vi p;
-  public:
-    ll count;
+  const int N;
+  vi p;
 
-    union_find(ll N) {
-      count = N;
-      for (ll i = 0; i < N; i++) {
-        p.push_back(-1); // size of trees encoded in root nodes as negative inverse
-      }
-    }
+  union_find(int n) : N(n), p(n, -1) { }
 
-    ll find(ll x) {
-      return p[x] < 0 ? x : p[x] = find(p[x]); // implicit path compression
-    }
+  int find(int x) {
+    return p[x] < 0 ? x : p[x] = find(p[x]);
+  }
 
-    void uni(ll x, ll y) {
-      ll i = find(x);
-      ll j = find(y);
-      if (i == j) return;
-      if (p[i] > p[j]) swap(i, j);
-      p[i] = j; p[j] += p[i];
-      count--;
-    }
+  void uni(int x, int y) {
+    int i = find(x);
+    int j = find(y);
+    if (i == j) return;
+    if (p[i] < p[j]) swap(i, j);
+    p[j] += p[i];
+    p[i] = j;
+  }
 
-    int size(int x) {
-      return -p[find(x)];
-    }
+  void move(int s, int t) {
+    int S = find(s);
+    int T = find(t);
+    if (S == T) return;
+    int newSizeS = p[S]+1;
+    int i = 0;
+    if (s == S) // set first child of s as new root
+      for (; i < N; i++) if (p[i] == s) { S = i; break; }
+    for (; i < N; i++) if (p[i] == s) p[i] = S;
+    p[S] = newSizeS;
+    p[T]--;
+    p[s] = T;
+  }
+
+  int size(int x) {
+    return -p[find(x)];
+  }
 };
 
-// Test for https://itu.kattis.com/problems/itu.islandinfection
-int main(void) {
-  ll R, C;
-  cin >> R >> C;
+// Test for https://itu.kattis.com/problems/itu.disjointsets
+int main() {
+  int n, m;
+  cin >> n >> m;
 
-  mi matrix;
+  auto uf = union_find(n);
 
-  ll hr, hc, vr, vc;
-
-  for (ll r = 0; r < R; r++)
+  int op, s, t;
+  for (int i = 0; i < m; i++)
   {
-    vi v;
-    string line;
-    cin >> line;
-
-    for (ll c = 0; c < C; c++)
-    {
-      ll i = line[c]-'0';
-      // treat virus and human as land, but remember coordinates
-      if      (i == 2) { vr = r; vc = c; v.push_back(1); }
-      else if (i == 3) { hr = r; hc = c; v.push_back(1); }
-      else             v.push_back(i);
-    }
-
-    matrix.push_back(v);
+    cin >> op >> s >> t;
+    if (op == 0) cout << ((uf.find(s) == uf.find(t)) ? 1 : 0) << endl;
+    if (op == 1) uf.uni(s, t);
+    if (op == 2) uf.move(s, t);
   }
-
-  union_find sets = union_find(R*C);
-
-  for (ll r = 0; r < R; r++)
-  {
-    for (ll c = 0; c < C; c++)
-    {
-      bool currIsLand =          matrix[r][c]   == 1;
-      bool upIsLand   = r > 0 && matrix[r-1][c] == 1;
-      bool leftIsLand = c > 0 && matrix[r][c-1] == 1;
-
-      if (currIsLand && upIsLand)
-        sets.uni((r*C)+c, ((r-1)*C)+c);
-
-      if (currIsLand && leftIsLand)
-        sets.uni((r*C)+c, (r*C)+(c-1));
-    }
-  }
-
-  if (sets.find((hr*C)+hc) == sets.find((vr*C)+vc))
-    cout << 1 << endl;
-  else
-    cout << 0 << endl;
-
   return 0;
 }
