@@ -17,80 +17,73 @@ typedef vector<ii> vii;
 typedef vector<vii> mii;
 template <class T> T smod(T a, T b) { return (a % b + b) % b; }
 int main(void) {
-  ll X, Y;
-  cin >> X >> Y;
+  ll K, T;
+  cin >> K >> T;
 
-  if (Y < X) {
+  if (T < K) {
     cout << "impossible" << endl;
     return 0;
   }
 
-  list<ll> singles;            // initially all xs
-  for (ll x = 0; x < X; x++)
-    singles.push_back(x);
-  vi c(X, 0);                  // initially all |Y|
-  mi next(X, vi(Y, 0));        // next[x] ys from low to high
-  mi rank(Y, vi(X, 0));        // rank[y][x] gives rank higher is better
-  vi y_x(Y, -1);
-  vi x_y(X, -1);
-
   ll D, E;
   cin >> D >> E;
 
-  set<ll> all_ys;
-  for (ll y = 0; y < Y; y++) all_ys.insert(y);
-
-  vector<set<ll>> not_seen;
-  for (ll i = 0; i < X; i++)
-    not_seen.push_back(all_ys);
-
   map<ll, ll> play_state;
+  mi earliest(K, vi(T, D));
+  mi least_dur(T, vi(K, 0));
 
-  ll s, x, y;
+  ll s, k, t;
   for (ll i = 0; i < E; i++)
   {
-    cin >> s >> x >> y;
-    x--; y--;
+    cin >> s >> k >> t;
+    k--; t--;
 
-    if (y != -1) {
-      next[x].push_back(y);
-      not_seen[x].erase(y);
-    }
+    if (t != -1)
+      earliest[k][t] = s;
 
     ll rem = D-s;
-    if (play_state.find(x) != play_state.end()) {
-      rank[play_state[x]][x] -= rem;
+    if (play_state.find(k) != play_state.end()) {
+      least_dur[play_state[k]][k] -= rem;
     }
 
-    if (y == -1) {
-      rank[play_state[x]][x] -= rem;
-      play_state.erase(x);
+    if (t == -1) {
+      least_dur[play_state[k]][k] -= rem;
+      play_state.erase(k);
     } else {
-      play_state[x] = y;
-      rank[y][x] += rem;
+      play_state[k] = t;
+      least_dur[t][k] += rem;
     }
   }
 
-  for (ll x = 0; x < X; x++)
-    for (auto y : not_seen[x])
-      next[x].push_back(y);
 
+  ll X = T;
+  ll Y = K;
+  list<ll> singles;
   for (ll x = 0; x < X; x++)
+    singles.push_back(x);
+  vi c(X, 0);
+  mi next(X, vi(Y, 0));
+  mi rank = earliest;
+  vi y_x(Y, -1);
+  vi x_y(X, -1);
+
+  for (ll t = 0; t < T; t++)
   {
     vii sorted;
-    for (ll y = 0; y < Y; y++)
-      sorted.push_back(ii{next[x][y], y});
+    for (ll k = 0; k < K; k++)
+      sorted.push_back(ii{least_dur[t][k], k});
+
     sort(sorted.begin(), sorted.end());
 
-    for (ll y = 0; y < Y; y++)
-      next[x][y] = sorted[y].second;
+    for (ll k = 0; k < K; k++)
+      next[t][k] = sorted[k].second;
   }
 
   while (!singles.empty())
   {
     ll x = singles.front();
     ll curr = c[x]++;
-    if (curr == Y) {
+    if (curr == K) {
       singles.pop_front();
       continue;
     }
@@ -101,7 +94,7 @@ int main(void) {
       singles.pop_front();
     } else {
       ll currX = y_x[y];
-      if (rank[currX] < rank[x]) continue;
+      if (rank[y][currX] <= rank[y][x]) continue;
       singles.pop_front(); singles.push_back(currX);
       x_y[currX] = -1;
       x_y[x] = y;
@@ -109,15 +102,15 @@ int main(void) {
     }
   }
 
-  for (ll x = 0; x < X; x++) {
-    if (x_y[x] == -1) {
+  for (ll y = 0; y < Y; y++) {
+    if (y_x[y] == -1) {
       cout << "impossible" << endl;
       return 0;
     }
   }
 
-  for (ll x = 0; x < X; x++)
-    cout << x_y[x]+1 << " ";
+  for (ll y = 0; y < Y; y++)
+    cout << y_x[y]+1 << " ";
   cout << endl;
 
   return 0;
