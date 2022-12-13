@@ -15,7 +15,8 @@ typedef vector<vii> mii;
 const int INF = ~(1<<31);
 template <class T> T smod(T a, T b) { return (a % b + b) % b; }
 
-// Given a set of intervals. Find maximum cardinality subset of non overlapping intervals.
+// Given a set of intervals.
+// Find maximum cardinality subset of non overlapping intervals.
 // 1. Sort on finish times
 // 2. Greedily take the next that doesn't overlap
 // Time complexity O(N log N) for sort, plus O(N) for greedy algorithm
@@ -34,19 +35,19 @@ int main(void) {
 
   sort(intervals.begin(), intervals.end());
 
-  ll num = 0;
-  ll frontier = 0;
+  ll count = 0;
+  ll prevFinish = 0;
 
-  for (auto item : intervals)
+  for (auto curr : intervals)
   {
-    bool noOverlap = frontier <= item.second;
+    bool noOverlap = prevFinish <= curr.second;
     if (noOverlap) {
-      frontier = item.first;
-      num++;
+      prevFinish = curr.first;
+      count++;
     }
   }
 
-  cout << num << endl;
+  cout << count << endl;
 
   return 0;
 }
