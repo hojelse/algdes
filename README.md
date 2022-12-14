@@ -25,12 +25,12 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [ ] drafttime
 - [ ] jealousyoungsters
 ### 2.0. Greedy
-- [ ] intervalscheduling
+- [x] intervalscheduling
 - [ ] grass
 - [ ] minimumscalar
 - [ ] woodcutting
 - [ ] classrooms
-- [ ] shopaholic
+- [x] shopaholic
 - [ ] birds
 - [ ] color
 - [ ] atlantis
