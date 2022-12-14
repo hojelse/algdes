@@ -27,7 +27,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 ### 2.0. Greedy
 - [x] intervalscheduling
 - [ ] grass
-- [ ] minimumscalar
+- [x] minimumscalar
 - [ ] woodcutting
 - [ ] classrooms
 - [x] shopaholic
