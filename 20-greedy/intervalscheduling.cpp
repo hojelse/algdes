@@ -17,8 +17,11 @@ template <class T> T smod(T a, T b) { return (a % b + b) % b; }
 
 // Given a set of intervals.
 // Find maximum cardinality subset of non overlapping intervals.
-// 1. Sort on finish times
+
+// Earliest start time first
+// 1. Sort on finish times ascending
 // 2. Greedily take the next that doesn't overlap
+
 // Time complexity O(N log N) for sort, plus O(N) for greedy algorithm
 int main(void) {
   ll N;
