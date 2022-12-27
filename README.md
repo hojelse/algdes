@@ -32,7 +32,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [ ] classrooms
 - [x] shopaholic
 - [ ] birds
-- [ ] color
+- [x] color
 - [ ] atlantis
 - [ ] profitablepizzas
 ### 3.0. Divide and conquer
