@@ -28,7 +28,7 @@ struct Flow {
 
   Flow(ll V, ll E, ll source, ll sink) : V(V), E(E), source(source), sink(sink), graph(V), scalar(0) {}
 
-  void addEdge(ll v1, ll v2, ll c) {
+  void add_edge(ll v1, ll v2, ll c) {
     scalar = max(scalar, c);
     edges.push_back(Edge{v1, v2, c, 0});
     graph[v1].push_back(edges.size()-1);
@@ -97,10 +97,9 @@ int main() {
 
   Flow G = Flow(V, E, src, sin);
   ll v1, v2, c;
-  for (ll i = 0; i < E; i++)
-  {
+  for (ll i = 0; i < E; i++) {
     cin >> v1 >> v2 >> c;
-    G.addEdge(v1, v2, c);
+    G.add_edge(v1, v2, c);
   }
 
   ll maxflow = G.max_flow();
