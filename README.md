@@ -19,7 +19,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [ ] longincsubseq
 - [x] mincut
 - [x] maxflow
-- [ ] polymul1
+- [x] polymul1
 - [ ] polymul2
 ### 1.0. Stable matching
 - [ ] drafttime
