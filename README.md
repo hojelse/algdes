@@ -17,7 +17,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [ ] minspantree
 - [ ] knapsack
 - [ ] longincsubseq
-- [ ] mincut
+- [x] mincut
 - [x] maxflow
 - [ ] polymul1
 - [ ] polymul2
