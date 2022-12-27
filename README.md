@@ -59,7 +59,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 ### 6.0. Mother of all Make-up Sessions
 - [ ] openpitmining
 - [ ] satisfiability
-- [ ] equalsumseasy
+- [x] equalsumseasy
 - [ ] shortestpath3
 - [ ] shortestpath2
 - [ ] arbitrage
