@@ -55,7 +55,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [ ] councilling
 - [ ] risk
 - [ ] escapeplan
-- [ ] paintball
+- [x] paintball
 ### 6.0. Mother of all Make-up Sessions
 - [ ] openpitmining
 - [ ] satisfiability
