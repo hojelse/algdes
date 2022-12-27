@@ -7,12 +7,14 @@ struct Flow {
   mi g;
   Flow(ll V, ll S, ll T)
     : V(V), S(S), T(T), M(0), g(V) {}
-  void add_edge(ll u, ll v, ll c) {
+  ll add_edge(ll u, ll v, ll c) {
     M = max(M, c);
+    ll id = es.size();
     es.push_back(Edge{u, v, c, 0});
-    g[u].push_back(es.size()-1);
+    g[u].push_back(id);
     es.push_back(Edge{v, u, 0, 0});
-    g[v].push_back(es.size()-1);
+    g[v].push_back(id+1);
+    return id;
   }
   ll augment(ll u, ll b, ll m, vi& seen) {
     if (u == T) return b;
