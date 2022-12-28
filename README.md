@@ -51,7 +51,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 ### 5.0. Network flow
 - [x] waif
 - [x] elementarymath
-- [ ] gopher2
+- [x] gopher2
 - [ ] councilling
 - [ ] risk
 - [x] escapeplan
