@@ -14,7 +14,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [x] itu.islandinfection
 ### 0.2 Classics
 - [x] shortestpath1
-- [ ] minspantree
+- [x] minspantree
 - [ ] knapsack
 - [ ] longincsubseq
 - [x] mincut
