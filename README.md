@@ -31,7 +31,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [x] woodcutting
 - [ ] classrooms
 - [x] shopaholic
-- [ ] birds
+- [x] birds
 - [x] color
 - [ ] atlantis
 - [ ] profitablepizzas
