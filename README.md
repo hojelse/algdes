@@ -49,7 +49,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [ ] presidentialelections
 - [ ] nesteddolls
 ### 5.0. Network flow
-- [ ] waif
+- [x] waif
 - [x] elementarymath
 - [ ] gopher2
 - [ ] councilling
