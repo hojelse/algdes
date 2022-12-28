@@ -44,7 +44,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [ ] baas
 - [ ] canonical
 - [ ] pebblesolitaire2
-- [ ] solitaire
+- [x] solitaire
 - [ ] orders
 - [ ] presidentialelections
 - [ ] nesteddolls
