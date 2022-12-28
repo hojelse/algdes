@@ -28,7 +28,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [x] intervalscheduling
 - [ ] grass
 - [x] minimumscalar
-- [ ] woodcutting
+- [x] woodcutting
 - [ ] classrooms
 - [x] shopaholic
 - [ ] birds
