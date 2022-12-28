@@ -54,7 +54,7 @@ Algorithm Design, MSc CS (Autumn 2022)
 - [ ] gopher2
 - [ ] councilling
 - [ ] risk
-- [ ] escapeplan
+- [x] escapeplan
 - [x] paintball
 ### 6.0. Mother of all Make-up Sessions
 - [ ] openpitmining
