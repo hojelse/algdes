@@ -15,9 +15,9 @@ Interval Partitioning         |  Earliest-start-time-first
 
 # Stable matching
 Stable Roommate *             |  No algorithm
-Stable Marriage **            |  Gale-Shapley propose-reject
-* Stable Roomate (1 set, pairs, fully ranked)
-** 2 set, pairs, fully ranked
+Stable Marriage **            |  Gale-Shapley propose-reject        |  O(N^2)
+* 1 set, 1-to-1 matching, fully ranked
+** 2 sets, 1-to-1 matching, fully ranked
 
 # Divide and Conquer
 Sorting                       |  Mergesort                          |  O(N log N) time  O(log N) space
@@ -34,7 +34,10 @@ Knapsack                      |  bottom-up                          |
 # Network Flows
 Minimum-cut                   |  Ford-Fulkerson                     |  O(m n C) time
 Maximum-flow                  |  Ford-Fulkerson                     |  O(m n C) time
+Maximum Matching              |  Ford-Fulkerson                     |  
 Bipartite Matching            |  Ford-Fulkerson                     |  O(m n) time
+
+Largest Bipartite Matching    |  ?                                  |  O(N^3) time
 
 # NP
 - Karp reduction
@@ -52,18 +55,19 @@ NP-Complete   |  Both NP and NP-hard.
 Co-NP
 
 Circuit-SAT                 |  
-3-SAT                       |  
+3-SAT                       |  NP-Complete
 Independent set             |  
 Vertex cover                |  
-Set cover                   |  
+Set cover                   |  O(2^N)
 Directed Hamiltonian cycle  |  
 Hamiltonian cycle           |  
 Hamiltonian path            |  
-Traveling Salesman          |  
+Traveling Salesman          |  NP-Complete
 Graph 3-color               |  
 Planar 3-color              |  
 Subset-sum                  |  
 Scheduling                  |  
+Knapsack                    |  NP-Complete
 
 Maximum cut, 3D matching, Factoring, Integer linear programming
 
