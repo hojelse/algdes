@@ -1,36 +1,42 @@
-// failing with time limit: https://open.kattis.com/submissions/10163740
+// fails with Time Limit https://open.kattis.com/submissions/10220053
+
+// (inverse) Subset Sums
 #include "../header.hpp"
 #include <map>
-ll p(ll j) {
-  return j-1;
+#include <list>
+// Subset sums O(nW) time O(nW) space
+void subset_sums(mi& cache, vi& w, ll N, ll W) {
+  for (ll i = 1; i <= N; i++) {
+    for (ll j = 0; j <= W; j++) {
+      cache[i][j] =
+        (j < w[i])
+        ? cache[i-1][j]
+        : max(cache[i-1][j], w[i] + cache[i-1][j-w[i]]);
+    }
+  }
 }
-ii best(ii a, ii b, ll K) {
-  auto [a_total, a_count] = a;
-  auto [b_total, b_count] = b;
-  ll delta_a = a_total - K;
-  ll delta_b = b_total - K;
-  if (a_total < K) return b;
-  if (b_total < K) return a;
-  if (delta_a < delta_b) return a;
-  if (delta_a > delta_b) return b;
-  if (a_count < b_count) return a;
-  return b;
+// Retrieve idxs O(n) time
+void retrieve_idxs(mi& cache, vi& w, list<ll>& idxs, ll& sum, ll i, ll j) {
+  if (i == 0) {}
+  else {
+    if(cache[i][j] > cache[i-1][j]) {
+      // idxs.push_front(i);
+      retrieve_idxs(cache, w, idxs, sum, i-1, j-w[i]);
+    } else {
+      retrieve_idxs(cache, w, idxs, sum, i-1, j);
+      // the idxs not in the subset
+      idxs.push_front(i);
+      sum += w[i];
+    }
+  }
 }
-ii rec(map<string, ii>& cache, vi& running_sum, vi& dems, ll K, ll j) {
-  if (j < 0) return ii{0, 0};
-  if (running_sum[j] < K) return ii{inf, inf};
-  string key = to_string(K);
-  if (cache.find(key) != cache.end()) return cache[key];
-
-  ll J = dems[j];
-  auto [total, count] = rec(cache, running_sum, dems, K-J, p(j));
-  ii a = ii{J + total, 1 + count};
-
-  ii b = rec(cache, running_sum, dems, K, j-1);
-
-  ii opt = best(a, b, K);
-  cache[key] = opt;
-  return opt;
+void print_cache(mi& cache, ll N, ll W) {
+  for (ll i = N; i > -1; i--) {
+    for (ll w = 0; w <= W; w++) {
+      cout << cache[i][w] << " ";
+    }
+    cout << endl;
+  }
 }
 void solve() {
   ll K; cin >> K;
@@ -42,22 +48,36 @@ void solve() {
   }
 
   ll n;
-  vi dems(N);
-  for (ll i = 0; i < N; i++) {
+  vi dems(N+1);
+  dems[0] = 0;
+  for (ll i = 1; i <= N; i++) {
     cin >> n;
     dems[i] = n;
   }
-  map<string, ii> cache;
   sort(dems.begin(), dems.end());
 
-  vi running_sum(N);
-  running_sum[0] = dems[0];
-  for (ll i = 1; i < N; i++) {
-    running_sum[i] = running_sum[i-1] + dems[i];
-  }
+  ll sum = 0;
+  for (ll dem: dems)
+    sum += dem;
 
-  auto [total, count] = rec(cache, running_sum, dems, K, N-1);
-  cout << total << " " << count << endl;
+  // cout << K << " " << N << endl;
+  // for (ll dem : dems)
+  //   cout << dem << " ";
+  // cout << endl;
+
+  ll W = (sum-K);
+
+  mi cache(N+1, vi(W+1, 0));
+  subset_sums(cache, dems, N, W);
+
+  print_cache(cache, N, W);
+
+  ll sum1 = 0;
+  list<ll> idxs;
+  retrieve_idxs(cache, dems, idxs, sum1, N, W);
+
+  cout << sum1 << " " << idxs.size() << endl;
+
 }
 int main() {
   ll T; cin >> T;
